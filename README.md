@@ -1,29 +1,35 @@
-; 16-bit Division using Repeated Subtraction
-; Dividend = 1357H
-; Divisor  = 0025H
+LXI SP,47FFH
 
-LXI H,1357H       ; HL = Dividend
-LXI D,0025H       ; DE = Divisor
-LXI B,0000H       ; BC = Quotient
+LXI H,4500H
+MOV A,M
+INX H
+MOV B,M
 
-DIV:  MOV A,L
-      SUB E
-      MOV L,A
+; ADDITION
+ADD B
+PUSH PSW
+STA 4502H
 
-      MOV A,H
-      SBB D
-      JC DONE
+MVI A,00H
+ACI 00H
+STA 4503H
 
-      MOV H,A
+POP H
+MOV A,L
+STA 4504H
 
-      INX B         ; Quotient = Quotient + 1
-      JMP DIV
+; SUBTRACTION
+LDA 4500H
+SUB B
+PUSH PSW
+STA 4505H
 
-DONE: SHLD 5100H    ; Remainder → 5100H (LSB), 5101H (MSB)
+MVI A,00H
+ACI 00H
+STA 4506H
 
-      MOV A,C
-      STA 5102H     ; Quotient LSB
-      MOV A,B
-      STA 5103H     ; Quotient MSB
+POP H
+MOV A,L
+STA 4507H
 
-      HLT
+HLT
